@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ventsim.vercel.app/sitemap.xml
+Sitemap: https://vent-sim-olive.vercel.app/sitemap.xml
