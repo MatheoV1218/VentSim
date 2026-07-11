@@ -20,7 +20,49 @@
 
 body {
   margin: 0;
-  min-width: 1366px;
+}
+
+/* The app itself (not the gate) needs real width to be usable; ScreenSizeGate
+ * blocks below 1000px in JS, so this only ever applies once past that gate. */
+.app-root {
+  min-width: 1000px;
+}
+
+/* ===== Screen size gate ===== */
+.screen-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: var(--bg);
+}
+
+.screen-gate-card {
+  max-width: 420px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 28px;
+}
+
+.screen-gate-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.screen-gate-card h1 {
+  font-size: 18px;
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+.screen-gate-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin: 0;
 }
 
 #root {
@@ -1054,4 +1096,97 @@ body {
 
 .vital-value-big {
   font-size: 24px;
+}
+
+/* ===== Responsive: laptops narrower than the 1920/1536 design width, down to MIN_WIDTH (1000px) ===== */
+@media (max-width: 1400px) {
+  .app-root {
+    padding: 12px;
+  }
+
+  .patient-monitor {
+    width: 190px;
+    padding: 10px;
+  }
+
+  .pb980-bottomrow {
+    grid-template-columns: 130px 1fr 100px;
+  }
+
+  .control-tile-grid-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .pb980-body,
+  .hamilton-body {
+    grid-template-columns: 1fr 220px;
+  }
+
+  .mech-cell {
+    min-width: 60px;
+  }
+
+  .mech-cell-value {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .sandbox-toolbar {
+    flex-wrap: wrap;
+    gap: 12px 20px;
+  }
+
+  .patient-monitor {
+    width: 160px;
+  }
+
+  .patient-monitor .pb980-vitals {
+    grid-template-columns: 1fr;
+  }
+
+  .pb980-bottomrow {
+    grid-template-columns: 110px 1fr 90px;
+    gap: 6px;
+  }
+
+  .control-tile-grid-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .screen-iconbtn span {
+    display: none;
+  }
+
+  .hw-btn-caption {
+    display: none;
+  }
+
+  .hw-btn-icon {
+    min-width: 40px;
+    padding: 8px;
+  }
+
+  .device-picker {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .pb980-body,
+  .hamilton-body {
+    grid-template-columns: 1fr 190px;
+  }
+
+  .control-tile-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hamilton-tile-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .waveform-canvas {
+    height: 105px;
+  }
 }

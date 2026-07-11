@@ -1,10 +1,13 @@
 import { SandboxScreen } from "./modes/sandbox/SandboxScreen";
+import { ScreenSizeGate } from "./ScreenSizeGate";
 
 function App() {
   return (
-    <div className="app-root">
-      <SandboxScreen />
-    </div>
+    <ScreenSizeGate>
+      <div className="app-root">
+        <SandboxScreen />
+      </div>
+    </ScreenSizeGate>
   );
 }
 
