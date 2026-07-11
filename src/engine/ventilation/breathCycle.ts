@@ -12,6 +12,10 @@ import type {
  *   flow = (Ptarget - PEEPtotal - V/C) / R
  * Expiration is always passive (RC exponential decay) regardless of mode, which is what
  * produces auto-PEEP / air trapping when the set expiratory time is short relative to R*C.
+ *
+ * Plateau pressure is the elastic-only component (PEEPtotal + V/C) at end-inspiration — the
+ * same reading a real zero-flow inspiratory pause would show — which is what makes Cdyn/Rdyn
+ * (derived from Ppeak vs Pplat) come out physiologically meaningful instead of Ppeak==Pplat.
  */
 export function tickBreathCycle(
   mechanics: MechanicsState,
@@ -27,6 +31,10 @@ export function tickBreathCycle(
 
   let { phase, phaseElapsed, cycleElapsed, volume, flow, peakPressure, lastVt, autoPeep } = mechanics;
   let plateauPressure = mechanics.plateauPressure;
+  let meanAirwayPressure = mechanics.meanAirwayPressure;
+  let dynamicCompliance = mechanics.dynamicCompliance;
+  let dynamicResistance = mechanics.dynamicResistance;
+  let meanPressureAccum = mechanics.meanPressureAccum;
   let pressure = mechanics.pressure;
 
   phaseElapsed += dt;
@@ -47,12 +55,15 @@ export function tickBreathCycle(
       pressure = peepTotal + volume / C + R * flow;
     }
     peakPressure = Math.max(peakPressure, pressure);
-    plateauPressure = pressure;
+    meanPressureAccum += pressure * dt;
 
     if (phaseElapsed >= ti) {
+      lastVt = volume;
+      plateauPressure = peepTotal + volume / C;
+      dynamicResistance = flow > 0.001 ? (peakPressure - plateauPressure) / flow : 0;
+      dynamicCompliance = plateauPressure - peepTotal > 0.001 ? volume / (plateauPressure - peepTotal) : C;
       phase = "exp";
       phaseElapsed = 0;
-      lastVt = volume;
     }
   } else {
     // Passive exhalation: dV/dt = -V / (R*C)
@@ -60,10 +71,13 @@ export function tickBreathCycle(
     flow = -volume / tau;
     volume = Math.max(volume + flow * dt, 0);
     pressure = peepTotal + volume / C + R * flow;
+    meanPressureAccum += pressure * dt;
 
     if (phaseElapsed >= te) {
       // Whatever volume remains above baseline is trapped gas -> auto-PEEP for next breath.
       autoPeep = volume / C;
+      meanAirwayPressure = cycleElapsed > 0.001 ? meanPressureAccum / cycleElapsed : pressure;
+      meanPressureAccum = 0;
       phase = "insp";
       phaseElapsed = 0;
       cycleElapsed = 0;
@@ -82,6 +96,10 @@ export function tickBreathCycle(
     lastVt,
     peakPressure,
     plateauPressure,
+    meanAirwayPressure,
+    dynamicCompliance,
+    dynamicResistance,
+    meanPressureAccum,
   };
 }
 
@@ -97,5 +115,9 @@ export function createInitialMechanics(): MechanicsState {
     lastVt: 0,
     peakPressure: 0,
     plateauPressure: 0,
+    meanAirwayPressure: 0,
+    dynamicCompliance: 0,
+    dynamicResistance: 0,
+    meanPressureAccum: 0,
   };
 }

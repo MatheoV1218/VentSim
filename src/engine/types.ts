@@ -29,7 +29,11 @@ export interface MechanicsState {
   autoPeep: number; // cmH2O, trapped pressure at end-expiration
   lastVt: number; // L, delivered/exhaled tidal volume of the last completed breath
   peakPressure: number; // cmH2O, running peak for the current/last breath
-  plateauPressure: number; // cmH2O, estimated (pressure at end-inspiratory pause)
+  plateauPressure: number; // cmH2O, elastic-only pressure at end-inspiration (zero-flow equivalent)
+  meanAirwayPressure: number; // cmH2O, time-weighted average over the last completed breath cycle
+  dynamicCompliance: number; // L/cmH2O, Vt / (Pplat - PEEPtotal) for the last completed breath
+  dynamicResistance: number; // cmH2O/(L/s), (Ppeak - Pplat) / end-inspiratory flow
+  meanPressureAccum: number; // internal: running integral of pressure*dt for the current cycle
 }
 
 export interface RespiratoryMechanicsParams {

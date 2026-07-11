@@ -3,6 +3,7 @@ import { useUiStore } from "../../state/uiStore";
 import { useSimulationLoop } from "../../state/useSimulationLoop";
 import { diseaseProfiles } from "../../data/diseases/diseaseProfiles";
 import { getVentilator } from "../../ventilators/registry";
+import { PatientMonitor } from "../../ventilators/shared/PatientMonitor";
 import { DevicePicker } from "./DevicePicker";
 import type { SimSpeed } from "../../engine/simClock";
 
@@ -22,6 +23,7 @@ export function SandboxScreen() {
   const selectVentilator = useUiStore((s) => s.selectVentilator);
   const selected = selectedVentilatorId ? getVentilator(selectedVentilatorId) : undefined;
   const Shell = selected?.Shell;
+  const patient = useSimulationStore((s) => s.patient);
 
   return (
     <div className="sandbox-screen">
@@ -68,7 +70,14 @@ export function SandboxScreen() {
         </button>
       </div>
 
-      {Shell ? <Shell /> : <DevicePicker />}
+      {Shell ? (
+        <div className="bedside-layout">
+          <Shell />
+          <PatientMonitor gas={patient.gas} mechanics={patient.mechanics} />
+        </div>
+      ) : (
+        <DevicePicker />
+      )}
     </div>
   );
 }

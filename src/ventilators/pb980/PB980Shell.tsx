@@ -3,12 +3,12 @@ import { useSimulationStore } from "../../state/simulationStore";
 import { waveformBuffer } from "../../state/waveformBuffer";
 import { WaveformCanvas } from "../../waveforms/WaveformCanvas";
 import { ControlTile } from "../shared/ControlTile";
-import { VitalsDock } from "../shared/VitalsDock";
+import { MechanicsDataBar } from "../shared/MechanicsDataBar";
 import { RotaryKnob } from "../shared/RotaryKnob";
 import { pb980Config } from "./pb980.config";
-import type { VentMode, VentilatorSettings } from "../../engine/types";
+import type { VentilatorSettings } from "../../engine/types";
 
-type Tab = "monitor" | "settings" | "alarms";
+type View = "monitor" | "alarms";
 
 export function PB980Shell() {
   const settings = useSimulationStore((s) => s.settings);
@@ -26,7 +26,7 @@ export function PB980Shell() {
   const patient = useSimulationStore((s) => s.patient);
   const diseaseId = useSimulationStore((s) => s.diseaseId);
 
-  const [tab, setTab] = useState<Tab>("monitor");
+  const [view, setView] = useState<View>("monitor");
   const [locked, setLocked] = useState(false);
   const [frozen, setFrozen] = useState(false);
   const [nebulizerOn, setNebulizerOn] = useState(false);
@@ -70,102 +70,119 @@ export function PB980Shell() {
             {o2Boost?.active && <span className="screen-o2-boost">100% O2 · {Math.ceil(o2Boost.untilSimTime - simTime)}s</span>}
           </div>
 
-          <div className="screen-tabs">
-            {(["monitor", "settings", "alarms"] as Tab[]).map((t) => (
-              <button key={t} className={`screen-tab ${tab === t ? "screen-tab-active" : ""}`} onClick={() => setTab(t)}>
-                {t === "monitor" ? "Monitoring" : t === "settings" ? "Vent Settings" : "Alarms"}
-              </button>
-            ))}
-          </div>
+          <MechanicsDataBar mechanics={patient.mechanics} settings={settings} className="pb980-databar" />
 
-          <div className="screen-content">
-            {tab === "monitor" && (
-              <div className="pb980-body">
-                <div className="pb980-waveforms">
-                  <WaveformCanvas buffer={waveformBuffer} valueKey="pressure" color="#f2c14e" yMin={-5} yMax={45} label="Paw" unit="cmH2O" frozen={frozen} />
-                  <WaveformCanvas buffer={waveformBuffer} valueKey="flow" color="#4ecbf2" yMin={-60} yMax={60} label="Flow" unit="L/min" frozen={frozen} />
-                  <WaveformCanvas buffer={waveformBuffer} valueKey="volume" color="#7cf24e" yMin={-0.1} yMax={0.8} label="Volume" unit="L" frozen={frozen} />
-                </div>
-                <VitalsDock gas={patient.gas} mechanics={patient.mechanics} />
+          {view === "monitor" ? (
+            <>
+              <div className="pb980-waveforms">
+                <WaveformCanvas buffer={waveformBuffer} valueKey="pressure" color="#f2c14e" yMin={-5} yMax={45} label="Paw" unit="cmH2O" frozen={frozen} />
+                <WaveformCanvas buffer={waveformBuffer} valueKey="flow" color="#4ecbf2" yMin={-60} yMax={60} label="Flow" unit="L/min" frozen={frozen} />
+                <WaveformCanvas buffer={waveformBuffer} valueKey="volume" color="#7cf24e" yMin={-0.1} yMax={0.8} label="Volume" unit="L" frozen={frozen} />
               </div>
-            )}
 
-            {tab === "settings" && (
-              <div className="settings-screen">
-                <div className="settings-mode-row">
-                  {pb980Config.modes.map((m: VentMode) => (
-                    <button key={m} className={m === settings.mode ? "mode-btn mode-btn-active" : "mode-btn"} onClick={() => setMode(m)}>
-                      {m === "VC" ? "Volume Control" : "Pressure Control"}
+              <div className="pb980-bottomrow">
+                <div className="patient-infobox">
+                  <div className="patient-infobox-type">Adult</div>
+                  <div className="patient-infobox-mode">{settings.mode === "VC" ? "A/C VC" : "A/C PC"}</div>
+                  <button
+                    className={`mode-btn ${settings.mode === "VC" ? "" : "mode-btn-active"}`}
+                    onClick={() => setMode(settings.mode === "VC" ? "PC" : "VC")}
+                  >
+                    Switch to {settings.mode === "VC" ? "PC" : "VC"}
+                  </button>
+                </div>
+
+                <div className="settings-strip">
+                  <div className="control-tile-grid control-tile-grid-strip">
+                    {applicableControls.map((c) => (
+                      <ControlTile
+                        key={c.key}
+                        label={c.label}
+                        unit={c.unit}
+                        appliedValue={readApplied(c.key)}
+                        pendingValue={readPending(c.key)}
+                        decimals={c.step < 1 ? 2 : 0}
+                        selected={selectedControlKey === c.key}
+                        onSelect={() => selectControl(c.key)}
+                      />
+                    ))}
+                  </div>
+                  <div className="knob-panel knob-panel-inline">
+                    <RotaryKnob disabled={!selectedConfig} onTurn={handleKnobTurn} />
+                    <div className="knob-hint">
+                      {selectedConfig ? `Turn to adjust ${selectedConfig.label}` : "Tap a parameter"}
+                    </div>
+                    <button className="accept-btn accept-btn-inline" disabled={!hasPendingChanges} onClick={acceptPending}>
+                      Accept
                     </button>
-                  ))}
-                </div>
-
-                <div className="control-tile-grid">
-                  {applicableControls.map((c) => (
-                    <ControlTile
-                      key={c.key}
-                      label={c.label}
-                      unit={c.unit}
-                      appliedValue={readApplied(c.key)}
-                      pendingValue={readPending(c.key)}
-                      decimals={c.step < 1 ? 2 : 0}
-                      selected={selectedControlKey === c.key}
-                      onSelect={() => selectControl(c.key)}
-                    />
-                  ))}
-                </div>
-
-                <div className="knob-panel">
-                  <RotaryKnob disabled={!selectedConfig} onTurn={handleKnobTurn} />
-                  <div className="knob-hint">
-                    {selectedConfig ? `Turn to adjust ${selectedConfig.label}` : "Select a parameter"}
+                    <button className="cancel-btn cancel-btn-inline" disabled={!hasPendingChanges} onClick={cancelPending}>
+                      Cancel
+                    </button>
                   </div>
                 </div>
 
-                <div className="accept-bar">
-                  <button className="accept-btn" disabled={!hasPendingChanges} onClick={acceptPending}>
-                    Accept Changes
+                <div className="screen-iconrail">
+                  <button className="screen-iconbtn" onClick={() => setView("monitor")} title="Home">
+                    <span>⌂</span>Home
                   </button>
-                  <button className="cancel-btn" disabled={!hasPendingChanges} onClick={cancelPending}>
-                    Cancel
+                  <button className="screen-iconbtn" onClick={() => setView("alarms")} title="Alarms">
+                    <span>🔔</span>Alarms
+                  </button>
+                  <button className="screen-iconbtn" title="Help">
+                    <span>?</span>Help
                   </button>
                 </div>
               </div>
-            )}
-
-            {tab === "alarms" && (
-              <div className="alarms-screen">
-                <p className="alarms-placeholder">
-                  Alarm limits and troubleshooting logic arrive in a later milestone. For now the device reports
-                  &ldquo;No Alarms&rdquo; at all times.
-                </p>
-              </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <div className="alarms-screen">
+              <p className="alarms-placeholder">
+                Alarm limits and troubleshooting logic arrive in a later milestone. For now the device reports
+                &ldquo;No Alarms&rdquo; at all times.
+              </p>
+              <button className="screen-iconbtn" onClick={() => setView("monitor")}>
+                <span>⌂</span>Back to Monitor
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="device-physical-controls">
-        <button className="hw-btn" onClick={() => triggerO2Boost()} disabled={!!o2Boost?.active}>
-          100% O2
-        </button>
-        <button
-          className={`hw-btn ${alarmSilenceRemaining > 0 ? "hw-btn-active" : ""}`}
+        <IconHwButton icon="☀" label="Brightness" />
+        <IconHwButton icon="🔒" label={locked ? "Unlock" : "Lock"} active={locked} onClick={() => setLocked((v) => !v)} />
+        <IconHwButton
+          icon="🔕"
+          label="Alarm Silence"
+          active={alarmSilenceRemaining > 0}
           onClick={() => setAlarmSilencedUntil(simTime + 120)}
-        >
-          Alarm Silence
-        </button>
-        <button className={`hw-btn ${nebulizerOn ? "hw-btn-active" : ""}`} onClick={() => setNebulizerOn((v) => !v)}>
-          Nebulizer
-        </button>
-        <button className={`hw-btn ${frozen ? "hw-btn-active" : ""}`} onClick={() => setFrozen((v) => !v)}>
-          Freeze
-        </button>
-        <button className={`hw-btn ${locked ? "hw-btn-active" : ""}`} onClick={() => setLocked((v) => !v)}>
-          {locked ? "Unlock" : "Screen Lock"}
-        </button>
+        />
+        <IconHwButton icon="💨" label="Nebulizer" active={nebulizerOn} onClick={() => setNebulizerOn((v) => !v)} />
+        <IconHwButton icon="❄" label="Freeze" active={frozen} onClick={() => setFrozen((v) => !v)} />
+        <IconHwButton icon="O2" label="100% O2" active={!!o2Boost?.active} onClick={() => triggerO2Boost()} disabled={!!o2Boost?.active} />
       </div>
     </div>
+  );
+}
+
+function IconHwButton({
+  icon,
+  label,
+  active,
+  disabled,
+  onClick,
+}: {
+  icon: string;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button className={`hw-btn hw-btn-icon ${active ? "hw-btn-active" : ""}`} onClick={onClick} disabled={disabled}>
+      <span className="hw-btn-glyph">{icon}</span>
+      <span className="hw-btn-caption">{label}</span>
+    </button>
   );
 }
 

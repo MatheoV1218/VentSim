@@ -832,3 +832,226 @@ body {
 .hamilton-tabpad {
   padding: 14px;
 }
+
+.hamilton-graphics-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hamilton-controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hamilton-tile-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* ===== Shared: mechanics data bar (always-visible vent-derived numbers) ===== */
+.mech-databar {
+  display: flex;
+  gap: 0;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid #1a2128;
+  overflow-x: auto;
+}
+
+.mech-cell {
+  flex: 1;
+  min-width: 68px;
+  text-align: center;
+  padding: 2px 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mech-cell:last-child {
+  border-right: none;
+}
+
+.mech-cell-warn .mech-cell-value {
+  color: #ff8080;
+}
+
+.mech-cell-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.mech-cell-value {
+  font-size: 17px;
+  font-weight: 600;
+  color: #eaf6ff;
+}
+
+.mech-cell-unit {
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-left: 2px;
+}
+
+.hamilton-databar {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ===== PB980: persistent single-screen layout ===== */
+.pb980-bottomrow {
+  display: grid;
+  grid-template-columns: 150px 1fr 120px;
+  gap: 10px;
+  padding: 10px 14px 14px;
+  border-top: 1px solid #1a2128;
+}
+
+.patient-infobox {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.patient-infobox-type {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.patient-infobox-mode {
+  font-size: 15px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.settings-strip {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.control-tile-grid-strip {
+  grid-template-columns: repeat(4, 1fr);
+  flex: 1;
+}
+
+.control-tile-grid-strip .control-tile {
+  padding: 6px 8px;
+}
+
+.knob-panel-inline {
+  flex-direction: column;
+  margin-top: 0;
+  gap: 6px;
+  padding: 8px;
+  min-width: 110px;
+}
+
+.knob-panel-inline .knob-hint {
+  text-align: center;
+  font-size: 10px;
+}
+
+.accept-btn-inline,
+.cancel-btn-inline {
+  padding: 5px 10px;
+  font-size: 11px;
+  width: 100%;
+}
+
+.screen-iconrail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.screen-iconbtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.screen-iconbtn span {
+  font-size: 14px;
+}
+
+/* Icon-style hardware buttons (replace text-label buttons) */
+.hw-btn-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 12px;
+  min-width: 56px;
+}
+
+.hw-btn-glyph {
+  font-size: 18px;
+}
+
+.hw-btn-caption {
+  font-size: 9px;
+  letter-spacing: 0.2px;
+}
+
+/* ===== Bedside layout: ventilator + separate patient monitor ===== */
+.bedside-layout {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.bedside-layout > .device-frame,
+.bedside-layout > .hamilton-frame {
+  flex: 1;
+  min-width: 0;
+}
+
+.patient-monitor {
+  width: 220px;
+  flex-shrink: 0;
+  background: #05070a;
+  border: 1px solid #1a2128;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+}
+
+.patient-monitor-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #7cf2a0;
+  margin-bottom: 10px;
+}
+
+.patient-monitor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7cf2a0;
+  box-shadow: 0 0 6px #7cf2a0;
+}
+
+.patient-monitor .pb980-vitals {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.vital-value-big {
+  font-size: 24px;
+}
