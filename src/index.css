@@ -1,0 +1,834 @@
+:root {
+  --bg: #0b0d10;
+  --panel: #12161a;
+  --panel-alt: #171c21;
+  --border: #262d33;
+  --text: #c8d0d6;
+  --text-dim: #7a8590;
+  --accent: #4ecbf2;
+  --warn: #ff5a5a;
+
+  font: 15px/1.4 ui-monospace, "Cascadia Code", Consolas, monospace;
+  color-scheme: dark;
+  color: var(--text);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 1366px;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-root {
+  padding: 16px;
+}
+
+/* Sandbox */
+.sandbox-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.sandbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sandbox-group label {
+  color: var(--text-dim);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sandbox-group select {
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font: inherit;
+}
+
+.sim-time {
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.speed-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.speed-btn,
+.reset-btn,
+.mode-btn {
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.speed-btn-active,
+.mode-btn-active {
+  background: var(--accent);
+  color: #0b0d10;
+  border-color: var(--accent);
+}
+
+.reset-btn {
+  margin-left: auto;
+}
+
+/* ===== Generic physical device chrome (shared by all ventilator skins) ===== */
+
+.device-frame {
+  background: linear-gradient(155deg, #3a3f47 0%, #24272c 45%, #1a1c20 100%);
+  border: 1px solid #0a0b0d;
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  box-shadow:
+    0 24px 60px -20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.device-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0 4px 10px 4px;
+}
+
+.device-badge-model {
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #dfe4e8;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.device-badge-brand {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #7a8590;
+  text-transform: uppercase;
+}
+
+.device-screen-bezel {
+  background: #0a0b0d;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), inset 0 0 0 1px #000;
+}
+
+.device-screen {
+  position: relative;
+  background: radial-gradient(ellipse at top, #0f1720 0%, #080b0d 70%);
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+}
+
+.device-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 18%);
+}
+
+.device-screen-locked::before {
+  content: "SCREEN LOCKED — tap Unlock on the bezel to resume";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 8, 10, 0.82);
+  color: #f2c14e;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding: 0 40px;
+}
+
+.device-screen-locked .screen-tabs,
+.device-screen-locked .screen-content {
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+/* Status bar */
+.screen-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid #1a2128;
+  font-size: 12px;
+}
+
+.screen-mode-chip {
+  background: var(--accent);
+  color: #06131a;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.screen-patient-label {
+  color: var(--text-dim);
+}
+
+.screen-simtime {
+  color: var(--accent);
+  margin-left: auto;
+}
+
+.screen-alarm-banner {
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.screen-alarm-none {
+  color: #7cf2a0;
+  background: rgba(124, 242, 160, 0.08);
+}
+
+.screen-alarm-silenced {
+  color: #f2c14e;
+  background: rgba(242, 193, 78, 0.1);
+}
+
+.screen-o2-boost {
+  color: #4ecbf2;
+  background: rgba(78, 203, 242, 0.1);
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* Tabs */
+.screen-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #1a2128;
+}
+
+.screen-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.screen-tab-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.screen-content {
+  flex: 1;
+  padding: 14px;
+  overflow: auto;
+}
+
+/* Physical control strip below the screen */
+.device-physical-controls {
+  display: flex;
+  gap: 10px;
+  padding-top: 14px;
+  justify-content: center;
+}
+
+.hw-btn {
+  background: linear-gradient(180deg, #3d434b 0%, #24282e 100%);
+  color: #cdd4da;
+  border: 1px solid #15171a;
+  border-radius: 7px;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #0d0e10, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.hw-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #0d0e10, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.hw-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.hw-btn-active {
+  background: linear-gradient(180deg, #2f7d94 0%, #1c4a58 100%);
+  color: #eafcff;
+  border-color: #0d2831;
+}
+
+/* Rotary knob */
+.rotary-knob {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a5058 0%, #22262b 60%, #14161a 100%);
+  border: 1px solid #0a0b0d;
+  box-shadow: 0 3px 0 #0a0b0d, inset 0 2px 3px rgba(255, 255, 255, 0.15), inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  touch-action: none;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.rotary-knob:active {
+  cursor: grabbing;
+}
+
+.rotary-knob-disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rotary-knob-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transition: transform 0.05s linear;
+}
+
+.rotary-knob-notch {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+
+.knob-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #1a2128;
+  border-radius: 8px;
+}
+
+.knob-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Vent Settings screen */
+.settings-mode-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.control-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.control-tile {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+
+.control-tile-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.control-tile-dirty {
+  border-color: #f2c14e;
+}
+
+.control-tile-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.control-tile-value {
+  font-size: 17px;
+}
+
+.control-tile-unit {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.control-tile-pending {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #f2c14e;
+}
+
+.accept-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.accept-btn,
+.cancel-btn {
+  padding: 9px 20px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.accept-btn {
+  background: #2f8f5e;
+  color: #eafff2;
+  border-color: #1c5c3b;
+}
+
+.accept-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.cancel-btn {
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.alarms-placeholder {
+  color: var(--text-dim);
+  font-size: 13px;
+  max-width: 480px;
+}
+
+/* Screen content layout (monitoring tab) */
+.pb980-body {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 12px;
+}
+
+.pb980-waveforms {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.waveform-canvas {
+  width: 100%;
+  height: 130px;
+  background: #0a0f0d;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: block;
+}
+
+.pb980-vitals {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  align-content: start;
+}
+
+.vital-tile {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.vital-warn {
+  border-color: var(--warn);
+}
+
+.vital-warn .vital-value {
+  color: var(--warn);
+}
+
+.vital-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.vital-value {
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.vital-unit {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.pb980-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.stepper {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  min-width: 130px;
+}
+
+.stepper-disabled {
+  opacity: 0.4;
+}
+
+.stepper-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.stepper-row button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.stepper-row button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.stepper-value {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.stepper-unit {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+/* ===== Device picker ===== */
+.device-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.device-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.device-card:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.device-card:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.device-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.device-card-maker {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.device-card-blurb {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.device-card-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.device-card-badge-available {
+  background: rgba(124, 242, 160, 0.12);
+  color: #7cf2a0;
+}
+
+.device-card-badge-planned {
+  background: rgba(122, 133, 144, 0.15);
+  color: var(--text-dim);
+}
+
+.switch-device-btn {
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ===== Hamilton C6 skin — light housing, touchscreen-first, left nav rail ===== */
+.hamilton-frame {
+  background: linear-gradient(160deg, #f4f6f8 0%, #e2e6ea 100%);
+  border: 1px solid #c7ccd1;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #1c2126;
+}
+
+.hamilton-housing-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: #2f6fed;
+  padding: 2px 4px 12px;
+}
+
+.hamilton-logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2f6fed;
+  box-shadow: 0 0 6px #2f6fed;
+}
+
+.hamilton-panel {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  background: #d7dce1;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.hamilton-navrail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hamilton-navitem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #eef1f4;
+  border: 1px solid #c7ccd1;
+  border-radius: 8px;
+  padding: 10px 4px;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.3px;
+  color: #4a5561;
+  cursor: pointer;
+}
+
+.hamilton-navitem:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.hamilton-navicon {
+  font-size: 15px;
+}
+
+.hamilton-navitem-active {
+  background: #2f6fed;
+  border-color: #2158c9;
+  color: #f2f6ff;
+}
+
+.hamilton-navrail-spacer {
+  flex: 1;
+}
+
+.hamilton-screen {
+  background: radial-gradient(ellipse at top, #10151c 0%, #05070a 75%);
+  border-radius: 8px;
+  min-height: 560px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 0 1px #000;
+}
+
+.hamilton-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid #1a2128;
+  font-size: 12px;
+  color: #9aa7b3;
+}
+
+.hamilton-mode-chip {
+  background: #2f6fed;
+  color: #eef4ff;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.hamilton-patient-label {
+  color: #7a8590;
+}
+
+.hamilton-simtime {
+  color: #2f9bed;
+  margin-left: auto;
+}
+
+.hamilton-alarm-banner {
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.hamilton-alarm-none {
+  color: #6fe0a0;
+  background: rgba(111, 224, 160, 0.08);
+}
+
+.hamilton-alarm-silenced {
+  color: #f2c14e;
+  background: rgba(242, 193, 78, 0.1);
+}
+
+.hamilton-o2-boost {
+  color: #00b3a4;
+  background: rgba(0, 179, 164, 0.1);
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.hamilton-body {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 12px;
+  padding: 14px;
+  flex: 1;
+}
+
+.hamilton-waveform-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -2px;
+}
+
+.hamilton-freeze-btn {
+  background: #142033;
+  color: #7fb8ff;
+  border: 1px solid #24406b;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hamilton-freeze-btn-active {
+  background: #2f6fed;
+  color: #eef4ff;
+}
+
+.hamilton-tabpad {
+  padding: 14px;
+}
